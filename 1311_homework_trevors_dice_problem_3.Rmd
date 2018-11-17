@@ -99,7 +99,7 @@ hist(x,
      xlim = c(3,10),
      freq = FALSE) #Probability densities are plotted
 
-
+#Plot density function over the histogram (normal distribution)
 m <- mean(x, na.rm = TRUE) #na.rm = TRUE: NA vlues should be stripped before the computation proceeds
 sd <-  sd(x, na.rm = TRUE) 
 curve(dnorm(x,m,sd),add=TRUE,lwd=3, col = "red") 
