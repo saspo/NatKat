@@ -28,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 *Tsunami scientist Trevor rolls some dice and tells you that the added result is 17. How many dice did Trevor roll?*
 
-The problem stated above deals with the issue of likelihood that is **"? a function/is a statistical method for estimating parameters from given data that selects as estimates those parameter values maximizing the probability of obtaining the observed data"**. To solve the problem of Trevor, a simulation of rolling a varying number of dice should be carried out.
+The problem stated above deals with the issue of likelihood. To solve the problem of Trevor, a simulation of rolling a varying number of dice should be carried out.
 
 We can solve Trevor's dice problem in several ways. Here you can see a possible approach: 
 
