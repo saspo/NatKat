@@ -1,0 +1,137 @@
+---
+title: "Glacial Lake Outburst Floods (GLOF)"
+author: "Sina Spors, Gwendolin Luedtke"
+date: "12 Dezember 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<div style="text-align: justify;"> 
+
+
+```{r}
+#create a vector of mapped landslide areas [in m²]
+area <- c(600, 70, 240, 120, 60, 340,80, 180, 450, 90, 60, 130, 140, 200)
+```
+
+
+```{r}
+#prior knowledge about Pareto index 
+#create a vector with values from alpha = 0.5 to alpha = 2.5 to illustrate our prior knowledge
+
+prior <- seq(from = 0.5, to = 2.5, by = 0.01)
+
+#create a normally distributed prior with a mean of 1.5 and a standard deviation of 0.2
+
+prior_prob <- dnorm(prior, mean = 1.5, sd = 0.2)
+
+#renormalisation to obtain a true probability distribution
+
+prior_prob <- prior_prob/sum(prior_prob)
+
+# plot the normal probability distribution
+
+plot(prior, prior_prob, 
+     type="h", 
+     main = "Prior probability distribution of the Pareto Index", 
+     xlab ="Pareto Index", 
+     ylab = "Prior probability", 
+     lwd = 2)
+grid()
+
+```
+
+
+
+
+```{r}
+#Package VGAM is required for applying the dpareto function
+#uncomment if necessary:
+#install.packages("VGAM")
+
+library(VGAM)
+
+#create a vector with the same number of entries as in "prior"
+likeli <- rep(NA, length(prior))
+
+#likelihood as product of Pareto distributions (dpareto), with fixed scale parameter and varying shape parameter
+for (i in seq_along(prior)) {
+ likeli[i] <- prod(dpareto(area, scale=min(area), shape=prior[i]))
+}
+
+#plot the likelihood
+
+plot(prior, likeli,
+     type ="h", 
+     main = "Likelihood", 
+     xlab ="Annual number of tropical cyclones", 
+     ylab = "Likelihood", 
+     lwd = 2)
+grid()
+
+
+
+#use of double-log scales for the classical display of the Pareto distribution
+plot(prior, likeli,
+     type ="h", 
+     main = "Likelihood", 
+     xlab ="Annual number of tropical cyclones", 
+     ylab = "Likelihood", 
+     lwd = 2,
+     log = "xy")
+grid()
+
+
+```
+
+
+
+```{r}
+#renormalise the product of likelihood and prior to calculate posterior 
+posterior <- likeli*prior_prob
+posterior <- posterior/sum(posterior)
+
+#plot the posterior probability distribution
+
+plot(prior, posterior, 
+     type = "h", 
+     main = "Posterior probability distribution", 
+     xlab ="Pareto Index", 
+     ylab = "Posterior probability", 
+     lwd = 2)
+grid()
+
+#find most probable Pareto Index
+prior[which.max(posterior)]
+
+#plot a vertical line for most probable Index 
+abline(v = 1.39, lty = 2, lwd = 2, col = "red")
+legend(57, 0.2, legend = c("most probable rate"),
+      col = c("red"), lty = 2, lwd = 1, cex = 0.8)
+
+```
+
+```{r, echo=FALSE}
+landslides <- dpareto(area, scale=min(area), shape= 1.39)
+landslides <- landslides/sum(landslides)
+
+plot(area, landslides, 
+     type = "h", 
+     main = "Pareto probability distribution for Thoma's landslide data", 
+     xlab ="Landslide area [m²]", 
+     ylab = "Probability", 
+     lwd = 2)
+grid()
+
+
+```
+
+
+
+
+
+</div>
+

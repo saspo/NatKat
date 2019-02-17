@@ -1,0 +1,103 @@
+---
+title: "Glacial Lake Outburst Floods (GLOF)"
+author: "Sina Spors, Gwendolin Luedtke"
+date: "12 Dezember 2018"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<div style="text-align: justify;"> 
+
+
+
+```{r}
+#damage states
+
+#EQ <- c(3/14, 5/14, 3/14, 3/14, 7/14, 5/14, 3/14)
+
+#0 for no high damage
+#1 for high damage 
+
+#EQ <- c(0,0,0,1,0,1,1,1,1,0,0,1,1,0,1,0,0,1,0,1,1,1,0,0,1,1,1,1)
+
+##Vektor muss wohl eher number of damages sein??? also anstatt no-damage <> total damage lieber nehmen: number of damages
+# successful outcomes
+
+EQ <- seq(from = 0, to = 50, by = 1)
+
+#volc <-
+#flood <-
+
+
+```
+
+
+
+
+```{r}
+#Prior belief on theta 
+
+#prior <- c(1/14, 3/14, 5/14, 7/14, 9/14, 11/14, 13/14)
+
+#Create theta values from 0 to 1 in 0.01 steps
+prior <- seq(from = 0, to = 1, by = 0.001)
+
+#create a beta distribution for prior belief values
+
+#prior_prob <- dbeta (prior, 4, 9)
+prior_prob <- dbeta (prior, 25, 5)
+prior_prob <- prior_prob/sum(prior_prob)
+
+plot (prior,prior_prob, type = "h")
+```
+
+
+
+
+```{r}
+#create a vector with the same number of entries as in "prior"
+likeli <- rep(NA, length(prior))
+
+for (i in seq_along(prior)) {
+ likeli[i] <- prod(dbinom(EQ, size = 100, prob = prior[i])) #size = length(EQ) oder max(EQ) oder willkürliche Tahl
+}
+
+#size = max(EQ=)
+
+
+##wohl eher multinorminal verteilung da ehr als 2 outcomes dmnom
+#https://www.rdocumentation.org/packages/extraDistr/versions/1.8.10/topics/Multinomial
+
+likeli <- dbinom(EQ, size = 100, prob = 0.5) #hier geht der Index von 0 bis 50
+likeli <- dbinom(EQ, size = 100, prob = 0.5) * dbinom(EQ, size = 100, prob = 0.8) #geht auch von 0 bis 50
+likeli <- dbinom(EQ, size = 100, prob = 0.5) * dbinom(EQ, size = 100, prob = 0.8) * dbinom(EQ, size = 100, prob = 0.2) * dbinom(EQ, size = 100, prob = 0.9) # geht auch von 0 bis 50 Warum geht likeli[i] nicht von 0 bis 50??
+
+likeli <- rep(NA, length(prior))
+
+for (i in seq_along(prior)) {
+ likeli[i] <- prod(dbinom(EQ, size = 100, prob = prior[i])) #size = length(EQ) oder max(EQ) oder willkürliche Tahl
+}
+
+plot(prior,likeli, type="h")
+
+```
+
+
+
+```{r}
+#Posterior
+posterior <- likeli*prior_prob
+posterior <- posterior/sum(posterior)
+
+plot(posterior, type="h")
+
+```
+
+
+
+</div>
+

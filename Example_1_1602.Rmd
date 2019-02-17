@@ -1,0 +1,84 @@
+---
+title: "Glacial Lake Outburst Floods (GLOF)"
+author: "Sina Spors, Gwendolin Luedtke"
+date: "12 Dezember 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#number of cyclones per year over the last 10 years
+cyclones <- c(9, 13, 8, 3, 10, 6, 13, 15, 16, 14)
+```
+
+```{r}
+#define all possible outcomes for the expectation rate
+prior <- seq(from = 0, to = 80, by = 1) 
+```
+
+```{r}
+#create uniformly distributed cyclone rates
+prior_prob <- rep(1/length(prior),times = length(prior)) 
+
+
+# plot the discrete uniform probability distribution
+
+plot(prior, prior_prob, 
+     type="h", 
+     main = "Prior probability distribution of annual cyclone rates", 
+     xlab ="Annual rate of tropical cyclones", 
+     ylab = "Prior probability", 
+     lwd = 2)
+grid()
+```
+
+```{r}
+#create a vector with the same number of entries as in "prior" as storage for calculated products
+likeli <- rep(NA,length(prior))
+
+#using a loop for the calculation of the likelihood
+#Poisson distribution: use of dpois with cyclones as input variable and prior belief (ourcomes) as rate parameter
+
+
+for (i in seq_along(prior))
+{
+  likeli[i] <- prod(dpois(cyclones,lambda=prior[i]))
+}
+
+#plot the likelihood
+
+plot(prior, likeli,
+     type ="h", 
+     main = "Likelihood", 
+     xlab ="Annual number of tropical cyclones", 
+     ylab = "Likelihood", 
+     lwd = 2)
+grid()
+```
+
+
+```{r}
+#calculate the posterior
+bayes_rate <- likeli * prior_prob
+bayes_rate <- bayes_rate/ sum(bayes_rate)
+
+#plot the posterior probability distribution
+
+plot(prior, bayes_rate, 
+     type = "h", 
+     main = "Posterior probability distribution of annual cyclone rates", 
+     xlab ="Annual number of tropical cyclones", 
+     ylab = "Posterior probability", 
+     lwd = 2)
+grid()
+
+#which(c(bayes_rate) == max (bayes_rate))
+
+#plot a vertical line for most probable rate 
+abline(v = 11, lty = 2, lwd = 2, col = "red")
+legend(57, 0.2, legend = c("most probable rate"),
+      col = c("red"), lty = 2, lwd = 1, cex = 0.8)
+```
